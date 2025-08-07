@@ -11,8 +11,9 @@ public class UsersController : Controller
     public UsersController(IUserService userService) => _userService = userService;
 
     [HttpGet]
-    public ViewResult List()
+    public ViewResult List(bool? isActive)
     {
+        
         var items = _userService.GetAll().Select(p => new UserListItemViewModel
         {
             Id = p.Id,
@@ -24,7 +25,7 @@ public class UsersController : Controller
 
         var model = new UserListViewModel
         {
-            Items = items.ToList()
+            Items = isActive.HasValue ? items.Where(u => u.IsActive == isActive).ToList() : items.ToList()
         };
 
         return View(model);
