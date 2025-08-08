@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace UserManagement.Web.Models.Users;
 
@@ -10,7 +11,9 @@ public class UserListViewModel
 public class UserListItemViewModel
 {
     public long Id { get; set; }
+    [Required]
     public string? Forename { get; set; }
+    [Required]
     public string? Surname { get; set; }
     public DateTime DateOfBirth { get; set; }
     public string? Email { get; set; }
