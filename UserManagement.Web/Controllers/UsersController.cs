@@ -48,21 +48,21 @@ public class UsersController : Controller
         {
             var user = GetUser(model);
 
-            _userService.Add(user);
+            await _userService.Add(user);
             return RedirectToAction(nameof(List));
         }
         return View(model);
     }
 
     [Route("Details/{id}")]
-    public IActionResult Details(long? id)
+    public async Task<IActionResult> Details(long? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var user = _userService.GetUserById((long)id);
+        var user = await _userService.GetUserById((long)id);
 
         if (user == null)
         {
@@ -75,14 +75,14 @@ public class UsersController : Controller
     }
 
     [Route("Edit/{id}")]
-    public IActionResult Edit(long? id)
+    public async Task<IActionResult> Edit(long? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var user = _userService.GetUserById((long)id);
+        var user = await _userService.GetUserById((long)id);
 
         if (user == null)
         {
@@ -129,14 +129,14 @@ public class UsersController : Controller
     }
 
     [Route("Delete/{id}")]
-    public IActionResult Delete(long? id)
+    public async Task<IActionResult> Delete(long? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var user = _userService.GetUserById((long)id);
+        var user = await _userService.GetUserById((long)id);
 
         if (user == null)
         {
@@ -152,12 +152,12 @@ public class UsersController : Controller
     [HttpPost]
     [Route("Delete/{id}")]
     [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(long id)
+    public async Task<IActionResult> DeleteConfirmed(long id)
     {
-        var user = _userService.GetUserById((long)id);
+        var user = await _userService.GetUserById((long)id);
         if (user != null)
         {
-            _userService.Delete(user);
+            await _userService.Delete(user);
         }
 
         return RedirectToAction(nameof(List));
