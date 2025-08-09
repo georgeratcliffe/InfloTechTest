@@ -19,29 +19,9 @@ public class UsersController : Controller
         IEnumerable<UserListItemViewModel> items;
 
         if (!isActive.HasValue)
-        {
-            items = _userService.GetAll().Select(p => new UserListItemViewModel
-            {
-                Id = p.Id,
-                Forename = p.Forename,
-                Surname = p.Surname,
-                DateOfBirth = p.DateOfBirth,
-                Email = p.Email,
-                IsActive = p.IsActive
-            });
-        }
+            items = _userService.GetAll().Select(p => GetModel(p));
         else
-        {
-            items = _userService.FilterByActive((bool)isActive).Select(p => new UserListItemViewModel
-            {
-                Id = p.Id,
-                Forename = p.Forename,
-                Surname = p.Surname,
-                DateOfBirth = p.DateOfBirth,
-                Email = p.Email,
-                IsActive = p.IsActive
-            });
-        }
+            items = _userService.FilterByActive((bool)isActive).Select(p => GetModel(p));
 
         var model = new UserListViewModel
         {
@@ -66,14 +46,7 @@ public class UsersController : Controller
 
         if (ModelState.IsValid)
         {
-            var user = new User()
-            {
-                Forename = model.Forename ?? string.Empty,
-                Surname = model.Surname ?? string.Empty,
-                DateOfBirth = model.DateOfBirth,
-                Email = model.Email ?? string.Empty,
-                IsActive = model.IsActive
-            };
+            var user = GetUser(model);
 
             _userService.Add(user);
             return RedirectToAction(nameof(List));
@@ -96,15 +69,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var model = new UserListItemViewModel
-        {
-            Id = user.Id,
-            Forename = user.Forename,
-            Surname = user.Surname,
-            DateOfBirth = user.DateOfBirth,
-            Email = user.Email,
-            IsActive = user.IsActive
-        };
+        var model = GetModel(user);
 
         return View(model);
     }
@@ -124,15 +89,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var model = new UserListItemViewModel
-        {
-            Id = user.Id,
-            Forename = user.Forename,
-            Surname = user.Surname,
-            DateOfBirth = user.DateOfBirth,
-            Email = user.Email,
-            IsActive = user.IsActive
-        };
+        var model = GetModel(user);
 
         return View(model);
     }
@@ -151,15 +108,8 @@ public class UsersController : Controller
         {
             try
             {
-                var user = new User()
-                {
-                    Id= model.Id,
-                    Forename = model.Forename ?? string.Empty,
-                    Surname = model.Surname ?? string.Empty,
-                    DateOfBirth = model.DateOfBirth,
-                    Email = model.Email ?? string.Empty,
-                    IsActive = model.IsActive
-                };
+                var user = GetUser(model);
+
                 _userService.Update(user);
             }
             catch (DbUpdateConcurrencyException)
@@ -178,7 +128,6 @@ public class UsersController : Controller
         return View(model);
     }
 
-
     [Route("Delete/{id}")]
     public IActionResult Delete(long? id)
     {
@@ -188,22 +137,13 @@ public class UsersController : Controller
         }
 
         var user = _userService.GetUserById((long)id);
-        //var user = await _context.User
-        //    .FirstOrDefaultAsync(m => m.Id == id);
+
         if (user == null)
         {
             return NotFound();
         }
 
-        var model = new UserListItemViewModel
-        {
-            Id = user.Id,
-            Forename = user.Forename,
-            Surname = user.Surname,
-            DateOfBirth = user.DateOfBirth,
-            Email = user.Email,
-            IsActive = user.IsActive
-        };
+        var model = GetModel(user);
 
         return View(model);
     }
@@ -221,6 +161,35 @@ public class UsersController : Controller
         }
 
         return RedirectToAction(nameof(List));
+    }
+
+
+    UserListItemViewModel GetModel(User user)
+    {
+        return (
+            new UserListItemViewModel
+            {
+                Id = user.Id,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                DateOfBirth = user.DateOfBirth,
+                Email = user.Email,
+                IsActive = user.IsActive
+            });
+    }
+
+    User GetUser(UserListItemViewModel model)
+    {
+        return (
+            new User()
+            {
+                Id = model.Id,
+                Forename = model.Forename ?? string.Empty,
+                Surname = model.Surname ?? string.Empty,
+                DateOfBirth = model.DateOfBirth,
+                Email = model.Email ?? string.Empty,
+                IsActive = model.IsActive
+            });
     }
 
 }
