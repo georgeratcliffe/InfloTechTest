@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using UserManagement.Data.Entities;
 using Westwind.AspNetCore.Markdown;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,8 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddDataAccess()
     .AddDomainServices()
+    .AddDomainAuditServices()
     .AddMarkdown()
     .AddControllersWithViews();
+
+builder.Services.AddKeyedScoped<List<AuditEntry>>("Audit", (_, _) => new());
 
 var app = builder.Build();
 

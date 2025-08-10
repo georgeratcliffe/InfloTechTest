@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
+using UserManagement.Services.Interfaces;
 using UserManagement.Web.Models.Users;
 
 namespace UserManagement.WebMS.Controllers;
@@ -11,7 +12,11 @@ namespace UserManagement.WebMS.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserService _userService;
-    public UsersController(IUserService userService) => _userService = userService;
+    private readonly IUserAuditService _userAuditService;
+    public UsersController(IUserService userService, IUserAuditService userAuditService) {
+        _userService = userService;
+        _userAuditService = userAuditService;
+    }
 
     [HttpGet]
     public ViewResult List(bool? isActive)
@@ -49,6 +54,8 @@ public class UsersController : Controller
             var user = GetUser(model);
 
             await _userService.Add(user);
+
+            var userAudits = _userAuditService.GetAllAudit().ToList();
             return RedirectToAction(nameof(List));
         }
         return View(model);
@@ -111,6 +118,7 @@ public class UsersController : Controller
                 var user = GetUser(model);
 
                 _userService.Update(user);
+                var userAudits = _userAuditService.GetAllAudit().ToList();
             }
             catch (DbUpdateConcurrencyException)
             {

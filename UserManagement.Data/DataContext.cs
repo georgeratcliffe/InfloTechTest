@@ -1,16 +1,25 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using UserManagement.Data.Entities;
 using UserManagement.Models;
 
 namespace UserManagement.Data;
 
 public class DataContext : DbContext, IDataContext
 {
+    private List<AuditEntry> _auditEntries = new();
     public DataContext() => Database.EnsureCreated();
 
+    public DataContext(List<AuditEntry> auditEntries)
+    {
+        _auditEntries = auditEntries;
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseInMemoryDatabase("UserManagement.Data.DataContext");
+        => options.UseInMemoryDatabase("UserManagement.Data.DataContext")
+        .AddInterceptors(new AuditInterceptor(_auditEntries));
 
     protected override void OnModelCreating(ModelBuilder model)
         => model.Entity<User>().HasData(new[]
@@ -29,6 +38,8 @@ public class DataContext : DbContext, IDataContext
         });
 
     public DbSet<User>? Users { get; set; }
+
+    public DbSet<AuditEntry>? AuditEntrys { get; set; }
 
     public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
         => base.Set<TEntity>();
