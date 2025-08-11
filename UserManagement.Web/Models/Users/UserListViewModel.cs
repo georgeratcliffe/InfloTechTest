@@ -15,6 +15,11 @@ public class UserDetailsViewModel
     public List<AuditEntry> AuditEntries { get; set; } = new();
 }
 
+public class AuditLogsViewModel
+{
+    public List<AuditEntry> AuditEntries { get; set; } = new();
+}
+
 public class UserListItemViewModel
 {
     public long Id { get; set; }

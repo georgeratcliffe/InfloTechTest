@@ -10,6 +10,6 @@ public class UserAuditService : IUserAuditService
     private readonly IDataContext _dataAccess;
     public UserAuditService(IDataContext dataAccess) => _dataAccess = dataAccess;
 
-    public IEnumerable<AuditEntry> GetAllAudit() => _dataAccess.GetAll<AuditEntry>();
+    public IEnumerable<AuditEntry> GetAllUserAudits() => _dataAccess.GetAll<AuditEntry>();
     public IEnumerable<AuditEntry> GetUserAuditsByUserId(long id) => _dataAccess.GetAll<AuditEntry>().Where(ua => ua.UserId == id);
 }

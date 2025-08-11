@@ -55,7 +55,7 @@ public class UsersController : Controller
 
             await _userService.Add(user);
 
-            var userAudits = _userAuditService.GetAllAudit().ToList();
+            //var userAudits = _userAuditService.GetAllAudit().ToList();
             return RedirectToAction(nameof(List));
         }
         return View(model);
@@ -126,7 +126,7 @@ public class UsersController : Controller
                 var user = GetUser(model);
 
                 _userService.Update(user);
-                var userAudits = _userAuditService.GetAllAudit().ToList();
+                //var userAudits = _userAuditService.GetAllUserAudits().ToList();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -177,6 +177,20 @@ public class UsersController : Controller
         }
 
         return RedirectToAction(nameof(List));
+    }
+
+
+    [Route("Logs")]
+    public ViewResult Logs()
+    {
+        var userAudits = _userAuditService.GetAllUserAudits().ToList();
+
+        var model = new AuditLogsViewModel
+        {
+            AuditEntries = userAudits
+        };
+
+        return View(model);
     }
 
 
