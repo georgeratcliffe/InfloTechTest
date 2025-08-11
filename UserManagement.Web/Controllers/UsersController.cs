@@ -71,12 +71,20 @@ public class UsersController : Controller
 
         var user = await _userService.GetUserById((long)id);
 
+        var userAudits = _userAuditService.GetUserAuditsByUserId((long)id).ToList();
+
         if (user == null)
         {
             return NotFound();
         }
 
-        var model = GetModel(user);
+        var userModel = GetModel(user);
+
+        UserDetailsViewModel model = new()
+        {
+            Item = userModel,
+            AuditEntries = userAudits
+        };
 
         return View(model);
     }

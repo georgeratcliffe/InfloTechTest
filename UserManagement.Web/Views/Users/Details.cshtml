@@ -1,49 +1,106 @@
-﻿@model UserListItemViewModel
+﻿@model UserDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1> User Details</h1>
 
 <div>
-    <h4>User</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Forename)
+            @Html.DisplayNameFor(model => model.Item.Forename)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Forename)
+            @Html.DisplayFor(model => model.Item.Forename)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Surname)
+            @Html.DisplayNameFor(model => model.Item.Surname)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Surname)
+            @Html.DisplayFor(model => model.Item.Surname)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateOfBirth)
+            @Html.DisplayNameFor(model => model.Item.DateOfBirth)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DateOfBirth)
+            @Html.DisplayFor(model => model.Item.DateOfBirth)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.Item.Email)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
+            @Html.DisplayFor(model => model.Item.Email)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
+            @Html.DisplayNameFor(model => model.Item.IsActive)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
+            @Html.DisplayFor(model => model.Item.IsActive)
         </dd>
     </dl>
 </div>
+
+
+<h2> Audit Logs</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Forename</th>
+                <th>Surname</th>
+                <th>Date of Birth</th>
+                <th>Email</th>
+                <th>Account Active</th>
+                <th>Start Date Time</th>
+                <th>End Date Time</th>
+                <th>State</th>
+                <th style="width: 1px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.AuditEntries)
+            {
+                <tr>
+                    <td>
+                        @item.Forename
+                    </td>
+                    <td>
+                        @item.Surname
+                    </td>
+                    <td>
+                        @Convert.ToString(string.Format("{0:dd/MM/yyyy}", item.DateOfBirth))
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>
+                    <td>
+                        @(item.IsActive ? "Yes" : "No")
+                    </td>
+                    <td>
+                        @(item.StartTime)
+                    </td>
+                    <td>
+                        @(item.EndTime)
+                    </td>
+                    <td>
+                        @(item.EntityState)
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+
+
+
+
+
+
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.Item.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 

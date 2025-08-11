@@ -1,11 +1,18 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using UserManagement.Data.Entities;
 
 namespace UserManagement.Web.Models.Users;
 
 public class UserListViewModel
 {
     public List<UserListItemViewModel> Items { get; set; } = new();
+}
+
+public class UserDetailsViewModel
+{
+    public UserListItemViewModel Item { get; set; } = new();
+    public List<AuditEntry> AuditEntries { get; set; } = new();
 }
 
 public class UserListItemViewModel
