@@ -2,7 +2,7 @@
 using UserManagement.Shared.ViewModels;
 
 namespace UserManagement.Shared.Helpers;
-public static class Helpers
+public class Helpers
 {
     public static UserListItemViewModel GetModel(User user)
     {

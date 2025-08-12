@@ -1,6 +1,8 @@
 using UserManagement.Data;
 using UserManagement.Services.Domain.Implementations;
 using UserManagement.Services.Domain.Interfaces;
+using UserManagement.Services.Implementations;
+using UserManagement.Services.Interfaces;
 using UserManager.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IDataContext, DataContext>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserAuditService, UserAuditService>();
 
 var app = builder.Build();
 
