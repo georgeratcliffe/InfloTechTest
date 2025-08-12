@@ -1,8 +1,8 @@
-﻿using System;
+﻿
 using System.ComponentModel.DataAnnotations;
 using UserManagement.Data.Entities;
 
-namespace UserManagement.Web.Models.Users;
+namespace UserManagement.Shared.ViewModels;
 
 public class UserListViewModel
 {
@@ -31,3 +31,4 @@ public class UserListItemViewModel
     public string? Email { get; set; }
     public bool IsActive { get; set; }
 }
+

@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Services.Interfaces;
-using UserManagement.Web.Models.Users;
+using UserManagement.Shared.ViewModels;
+using UserManagement.Shared.Helpers;
 
 namespace UserManagement.WebMS.Controllers;
 
@@ -24,9 +24,9 @@ public class UsersController : Controller
         IEnumerable<UserListItemViewModel> items;
 
         if (!isActive.HasValue)
-            items = _userService.GetAll().Select(p => GetModel(p));
+            items = _userService.GetAll().Select(p => Helpers.GetModel(p));
         else
-            items = _userService.FilterByActive((bool)isActive).Select(p => GetModel(p));
+            items = _userService.FilterByActive((bool)isActive).Select(p => Helpers.GetModel(p));
 
         var model = new UserListViewModel
         {
@@ -51,7 +51,7 @@ public class UsersController : Controller
 
         if (ModelState.IsValid)
         {
-            var user = GetUser(model);
+            var user = Helpers.GetUser(model);
 
             await _userService.Add(user);
 
@@ -78,7 +78,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var userModel = GetModel(user);
+        var userModel = Helpers.GetModel(user);
 
         UserDetailsViewModel model = new()
         {
@@ -104,7 +104,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var model = GetModel(user);
+        var model = Helpers.GetModel(user);
 
         return View(model);
     }
@@ -123,7 +123,7 @@ public class UsersController : Controller
         {
             try
             {
-                var user = GetUser(model);
+                var user = Helpers.GetUser(model);
 
                 _userService.Update(user);
                 //var userAudits = _userAuditService.GetAllUserAudits().ToList();
@@ -159,7 +159,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var model = GetModel(user);
+        var model = Helpers.GetModel(user);
 
         return View(model);
     }
@@ -192,34 +192,4 @@ public class UsersController : Controller
 
         return View(model);
     }
-
-
-    UserListItemViewModel GetModel(User user)
-    {
-        return (
-            new UserListItemViewModel
-            {
-                Id = user.Id,
-                Forename = user.Forename,
-                Surname = user.Surname,
-                DateOfBirth = user.DateOfBirth,
-                Email = user.Email,
-                IsActive = user.IsActive
-            });
-    }
-
-    User GetUser(UserListItemViewModel model)
-    {
-        return (
-            new User()
-            {
-                Id = model.Id,
-                Forename = model.Forename ?? string.Empty,
-                Surname = model.Surname ?? string.Empty,
-                DateOfBirth = model.DateOfBirth,
-                Email = model.Email ?? string.Empty,
-                IsActive = model.IsActive
-            });
-    }
-
 }

@@ -12,6 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UserManagement.Services\UserManagement.Services.csproj" />
+    <ProjectReference Include="..\UserManagement.Shared\UserManagement.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Users\" />
   </ItemGroup>
 
 </Project>
