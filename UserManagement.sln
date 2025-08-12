@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManager.API", "UserMana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.Shared", "UserManagement.Shared\UserManagement.Shared.csproj", "{3855C43B-089D-44DE-8288-91E82A5F9AE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.Blazor", "UserManagement.Blazor\UserManagement.Blazor\UserManagement.Blazor.csproj", "{F576FE2B-1992-4DC3-90E2-B3CA16B4BB48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.Blazor.Client", "UserManagement.Blazor\UserManagement.Blazor.Client\UserManagement.Blazor.Client.csproj", "{1138CCAE-B5DE-44F7-B185-CCFBBE577AD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +71,14 @@ Global
 		{3855C43B-089D-44DE-8288-91E82A5F9AE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3855C43B-089D-44DE-8288-91E82A5F9AE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3855C43B-089D-44DE-8288-91E82A5F9AE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F576FE2B-1992-4DC3-90E2-B3CA16B4BB48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F576FE2B-1992-4DC3-90E2-B3CA16B4BB48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F576FE2B-1992-4DC3-90E2-B3CA16B4BB48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F576FE2B-1992-4DC3-90E2-B3CA16B4BB48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1138CCAE-B5DE-44F7-B185-CCFBBE577AD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1138CCAE-B5DE-44F7-B185-CCFBBE577AD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1138CCAE-B5DE-44F7-B185-CCFBBE577AD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1138CCAE-B5DE-44F7-B185-CCFBBE577AD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
