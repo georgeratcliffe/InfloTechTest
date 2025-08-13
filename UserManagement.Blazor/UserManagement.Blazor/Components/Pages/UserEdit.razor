@@ -1,0 +1,82 @@
+﻿@page "/edit/{UserId}"
+@rendermode InteractiveServer
+
+@using System.Text.Json
+@using System.Text
+@using Newtonsoft.Json
+@using UserManagement.Shared.ViewModels
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavManager
+
+<h3>Edit User</h3>
+
+
+<EditForm Model="@User" FormName="myEditForm" OnValidSubmit="@HandleSubmit" Enhance>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="forename">Forename</label>
+        <InputText @bind-Value="@User.Forename" class="form-control" id="forename" />
+        <ValidationMessage For="() => User.Forename" />
+    </div>
+    <div class="form-group">
+        <label for="surname">Surname</label>
+        <InputText @bind-Value="@User.Surname" class="form-control" id="surname" />
+        <ValidationMessage For="() => User.Surname" />
+    </div>
+    <div class="form-group">
+        <label for="dob">Date Of Birth</label>
+        <InputDate @bind-Value="@User.DateOfBirth" class="form-control" id="dob" />
+        <ValidationMessage For="() => User.DateOfBirth" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText @bind-Value="@User.Email" class="form-control" id="email" />
+        <ValidationMessage For="() => User.Email" />
+    </div>
+    <div class="form-group">
+        <label for="active">Is Active</label>
+        <InputCheckbox @bind-Value="@User.IsActive" class="form-check-input" id="active" />
+        <ValidationMessage For="() => User.IsActive" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="button" @onclick="HandleCancelClick" name="Cancel" class="btn btn-secondary">Cancel</button>
+
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public string? UserId { get; set; }
+
+    public UserListItemViewModel User { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userResponse = await HttpClient.GetAsync($"api/GetUserByUserId/{UserId}");
+        var userResult = await userResponse.Content.ReadAsStringAsync();
+        User = JsonConvert.DeserializeObject<UserListItemViewModel>(userResult) ?? new UserListItemViewModel();
+    }
+
+    private async Task HandleSubmit()
+    {
+        var newUser = System.Text.Json.JsonSerializer.Serialize(User);
+        var requestContent = new StringContent(newUser, Encoding.UTF8, "application/json");
+
+        await HttpClient.PutAsync($"api/EditUser/{UserId}", requestContent);
+        NavManager.NavigateTo("/userslist");
+    }
+
+    private void HandleCancelClick()
+    {
+        User.Forename = string.Empty;
+        User.Surname = string.Empty;
+        User.Email = string.Empty;
+        User.DateOfBirth = default;
+        User.IsActive = false;
+    }
+
+}

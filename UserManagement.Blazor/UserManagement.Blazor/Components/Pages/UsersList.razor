@@ -1,0 +1,84 @@
+﻿@page "/userslist"
+@using BlazorBootstrap
+@using Newtonsoft.Json
+@using UserManagement.Shared.ViewModels
+
+@inject HttpClient HttpClient
+
+<h3>Users List</h3>
+
+@if(Items == null )
+{
+    <p>Loading</p>
+}
+
+<div class="table-responsive">
+    <table id="demoGrid" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Forename</th>
+                <th>Surname</th>
+                <th>Date of Birth</th>
+                <th>Email</th>
+                <th>Account Active</th>
+                <th style="width: 1px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Items?? new())
+            {
+                <tr>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td>
+                        @item.Forename
+                    </td>
+                    <td>
+                        @item.Surname
+                    </td>
+                    <td>
+                        @Convert.ToString(string.Format("{0:dd/MM/yyyy}", item.DateOfBirth))
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>
+                    <td>
+                        @(item.IsActive ? "Yes" : "No")
+                    </td>
+                    <td>
+                        <div class="dropdown">
+
+                        <Dropdown Color="DropdownColor.Primary">
+                            <DropdownToggleButton>Dropdown button</DropdownToggleButton>
+                            <DropdownMenu>
+                                    <DropdownItem To=@($"/details/{item.Id}") Type="DropdownItemType.Link">View</DropdownItem>
+                                    <DropdownItem To=@($"/edit/{item.Id}") Type="DropdownItemType.Link">Edit</DropdownItem>
+                                    <DropdownItem To=@($"/delete/{item.Id}") Type="DropdownItemType.Link">Delete</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <Button Type="ButtonType.Link" Color="ButtonColor.Primary" To="/create">Create User</Button>
+</div>
+
+
+@code {
+
+    public List<UserListItemViewModel>? Items { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await HttpClient.GetAsync("/api/GetAllUsers");
+        var result = await response.Content.ReadAsStringAsync();
+        Items = JsonConvert.DeserializeObject<List<UserListItemViewModel>>(result);
+    }
+
+}

@@ -1,8 +1,10 @@
-﻿@model UserDetailsViewModel
+﻿@page "/details/{UserId}"
+@using BlazorBootstrap
+@using UserManagement.Data.Entities
+@using UserManagement.Shared.ViewModels
 
-@{
-    ViewData["Title"] = "Details";
-}
+@using Newtonsoft.Json
+@inject HttpClient HttpClient
 
 <h1> User Details</h1>
 
@@ -10,38 +12,37 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Forename)
+            Forename
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Forename)
+            @User?.Forename
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Surname)
+            Surname
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Surname)
+            @User?.Surname
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.DateOfBirth)
+            DateOfBirth
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.DateOfBirth)
+            @User?.DateOfBirth
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Email)
+            Email
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Email)
+            @User?.Email)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.IsActive)
+            IsActive
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.IsActive)
+            @User?.IsActive
         </dd>
     </dl>
 </div>
-
 
 <h2> Audit Logs</h2>
 
@@ -60,7 +61,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.AuditEntries)
+            @foreach (var item in AuditEntries ?? new())
             {
                 <tr>
                     <td>
@@ -86,11 +87,35 @@
                     </td>
                 </tr>
             }
+            </tbody>
         </table>
+   
     </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Item.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<Button Type="ButtonType.Link" Color="ButtonColor.Primary" To="@($"/edit/{UserId}")"> Edit User </Button>
 
+<Button Type="ButtonType.Link" Color="ButtonColor.Primary" To="/userslist"> Back to User List </Button>
+
+
+
+@code {
+
+    [Parameter]
+    public string? UserId { get; set; }
+
+    public UserListItemViewModel? User { get; set; } = new();
+
+    public List<AuditEntry>? AuditEntries { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userResponse = await HttpClient.GetAsync($"api/GetUserByUserId/{UserId}");
+        var userResult = await userResponse.Content.ReadAsStringAsync();
+        User = JsonConvert.DeserializeObject<UserListItemViewModel>(userResult);
+
+        var userAuditResponse = await HttpClient.GetAsync($"api/GetUserAuditByUserId/{UserId}");
+        var userAuditResult = await userAuditResponse.Content.ReadAsStringAsync();
+        AuditEntries = JsonConvert.DeserializeObject<List<AuditEntry>>(userAuditResult);
+    }
+
+}

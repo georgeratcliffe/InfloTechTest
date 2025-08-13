@@ -1,0 +1,31 @@
+﻿@page "/delete/{UserId}"
+@rendermode InteractiveServer
+@using BlazorBootstrap
+
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavManager
+
+
+<h3>Delete User</h3>
+
+<h3>Do you want to delete this user?</h3>
+<br/>
+<button type="button" @onclick="HandleDeleteClick" name="Cancel" class="btn btn-primary">Delete</button>
+<button type="button" @onclick="HandleCancelClick" name="Cancel" class="btn btn-secondary">Cancel</button>
+
+@code {
+    [Parameter]
+    public string? UserId { get; set; }
+
+    private async Task HandleDeleteClick()
+    {
+        await HttpClient.DeleteAsync($"api/DeleteUser/{UserId}");
+        NavManager.NavigateTo("/userslist");
+    }
+
+    private void HandleCancelClick()
+    {
+        NavManager.NavigateTo("/userslist");
+    }
+}

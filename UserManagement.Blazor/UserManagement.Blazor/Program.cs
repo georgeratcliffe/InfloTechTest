@@ -1,4 +1,4 @@
-using UserManagement.Blazor.Client.Pages;
+using Microsoft.AspNetCore.Components;
 using UserManagement.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +6,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped(sp =>
+{
+    NavigationManager navigation = sp.GetRequiredService<NavigationManager>();
+    //return new HttpClient { BaseAddress = new Uri(navigation.BaseUri) };
+    return new HttpClient { BaseAddress = new Uri("https://localhost:7074/") };
+});
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowBlazorOrigin", builder =>
+    {
+        builder.WithOrigins("https://localhost:7074/");
+    });
+});
+
 
 var app = builder.Build();
 
@@ -21,10 +39,16 @@ else
     app.UseHsts();
 }
 
+app.UseCors("AllowBlazorOrigin");
+
 app.UseHttpsRedirection();
+
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 
 app.UseAntiforgery();
+
+app.UseCors("AllowBlazorOrigin");
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

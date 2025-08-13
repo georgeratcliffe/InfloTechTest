@@ -1,0 +1,70 @@
+﻿@page "/create"
+@rendermode InteractiveServer
+
+@using System.Text.Json
+@using System.Text
+@using UserManagement.Shared.ViewModels
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavManager
+
+<h3>Create New User</h3>
+
+
+<EditForm Model="@NewUser" FormName="myEditForm" OnValidSubmit="@HandleSubmit" Enhance>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+      <div class="form-group">
+        <label for="forename">Forename</label>
+        <InputText @bind-Value="@NewUser.Forename" class="form-control" id="forename" />
+        <ValidationMessage For="() => NewUser.Forename" />
+      </div>
+      <div class="form-group">
+        <label for="surname">Surname</label>
+        <InputText @bind-Value="@NewUser.Surname" class="form-control" id="surname" />
+        <ValidationMessage For="() => NewUser.Surname" />
+      </div>
+      <div class="form-group">
+        <label for="dob">Date Of Birth</label>
+        <InputDate @bind-Value="@NewUser.DateOfBirth" class="form-control" id="dob" />
+        <ValidationMessage For="() => NewUser.DateOfBirth" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <InputText @bind-Value="@NewUser.Email" class="form-control" id="email" />
+        <ValidationMessage For="() => NewUser.Email" />
+      </div>
+       <div class="form-group">
+        <label for="active">Is Active</label>
+        <InputCheckbox @bind-Value="@NewUser.IsActive" class="form-check-input" id="active" />
+        <ValidationMessage For="() => NewUser.IsActive" />
+      </div>
+      <br/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="button" @onclick="HandleCancelClick" name="Cancel" class="btn btn-secondary">Cancel</button>
+</EditForm>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public UserListItemViewModel NewUser { get; set; } = new();
+
+    private async Task HandleSubmit()
+    {
+        var newUser = JsonSerializer.Serialize(NewUser);
+        var requestContent = new StringContent(newUser, Encoding.UTF8, "application/json");
+
+        await HttpClient.PostAsync("/api/CreateUser/", requestContent);
+        NavManager.NavigateTo("/userslist");
+    }
+
+    private void HandleCancelClick()
+    {
+        NewUser.Forename = string.Empty;
+        NewUser.Surname = string.Empty;
+        NewUser.Email = string.Empty;
+        NewUser.DateOfBirth = default;
+        NewUser.IsActive = false;
+    }
+
+}
