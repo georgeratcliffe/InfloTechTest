@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\UserManager.API\UserManager.API.csproj" />
     <ProjectReference Include="..\UserManagement.Blazor.Client\UserManagement.Blazor.Client.csproj" />
     <PackageReference Include="Blazor.Bootstrap" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
   </ItemGroup>

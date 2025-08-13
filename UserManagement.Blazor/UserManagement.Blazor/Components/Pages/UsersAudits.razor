@@ -1,0 +1,42 @@
+﻿@page "/usersauditslist"
+@rendermode InteractiveServer
+@using BlazorBootstrap
+@using Newtonsoft.Json
+@using UserManagement.Data.Entities
+@using UserManagement.Shared.ViewModels
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject HttpClient HttpClient
+
+<h3>Users Audits</h3>
+
+<QuickGrid Items="Items.AsQueryable()" Pagination="@paginationState">
+    <PropertyColumn Property="@(item => item.UserId)" Title="User Id" Sortable="true" />
+    <PropertyColumn Property="@(item => item.Forename)" Title="Forename" Sortable="true" />
+    <PropertyColumn Property="@(item => item.Surname)" Title="Surname" Sortable="true" />
+    <PropertyColumn Property="@(item => item.DateOfBirth)" Title="Date Of Birth" Sortable="true" />
+    <PropertyColumn Property="@(item => item.Email)" Title="Email" Sortable="true" />
+    <PropertyColumn Property="@(item => item.IsActive)" Title="Is Active" Sortable="true" />
+    <PropertyColumn Property="@(item => item.EndTime)" Title="Action Time" Sortable="true" />
+    <PropertyColumn Property="@(item => item.EntityState)" Title="State" Sortable="true" />
+</QuickGrid>
+
+<Paginator State="@paginationState" />
+
+
+@code {
+
+    public List<AuditEntry> Items { get; set; } = new();
+
+    private HashSet<AuditEntry> selectedItems = new();
+
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await HttpClient.GetAsync("/api/GetAllUserAudits");
+        var result = await response.Content.ReadAsStringAsync();
+        Items = JsonConvert.DeserializeObject<List<AuditEntry>>(result) ?? new();
+    }
+
+}
