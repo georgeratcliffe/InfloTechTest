@@ -105,7 +105,7 @@ public class UserControllerTests
         _userService.Setup(s => s.GetUserById(It.IsAny<long>())).Returns(Task.FromResult(new User()));
         #pragma warning restore CS8620
 
-        UsersController controller = CreateControllerWithServices(_userService, _userAuditService);
+        var controller = CreateController();
 
         // Act: Invokes the method under test with the arranged parameters.
         var result = await controller.Details(userId) as ViewResult;
@@ -143,7 +143,7 @@ public class UserControllerTests
         _userService.Setup(s => s.GetUserById(It.IsAny<long>())).Returns(Task.FromResult(new User()));
         #pragma warning restore CS8620
 
-        UsersController controller = CreateControllerWithServices(_userService, _userAuditService);
+        var controller = CreateController();
 
         // Act: Invokes the method under test with the arranged parameters.
         var result = await controller.Edit(userId) as ViewResult;
@@ -179,7 +179,7 @@ public class UserControllerTests
 
         _userService.Setup(s => s.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
-        UsersController controller = CreateControllerWithServices(_userService, _userAuditService);
+        var controller = CreateController();
 
         // Act: Invokes the method under test with the arranged parameters.
         var result = await controller.Edit(userId,model) as ViewResult;
@@ -215,9 +215,9 @@ public class UserControllerTests
 
         #pragma warning disable CS8620
         _userService.Setup(s => s.GetUserById(It.IsAny<long>())).Returns(Task.FromResult(new User()));
-           #pragma warning restore CS8620
+#pragma warning restore CS8620
 
-        UsersController controller = CreateControllerWithServices(_userService, _userAuditService);
+        var controller = CreateController();
 
         // Act: Invokes the method under test with the arranged parameters.
         var result = await controller.Delete(userId) as ViewResult;
@@ -252,9 +252,5 @@ public class UserControllerTests
     private readonly Mock<IUserService> _userService = new();
     private readonly Mock<IUserAuditService> _userAuditService = new();
     private UsersController CreateController() => new(_userService.Object, _userAuditService.Object);
-
-    private static UsersController CreateControllerWithServices(Mock<IUserService> userService, Mock<IUserAuditService> userAuditService )
-    { return new UsersController(userService.Object, userAuditService.Object); }
-
 
 }
