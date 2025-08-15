@@ -13,8 +13,8 @@ public interface IUserService
     /// <returns></returns>
     IEnumerable<User> FilterByActive(bool isActive);
     IEnumerable<User> GetAll();
-    Task Add(User user);
     Task<User?> GetUserById(long id);
+    Task Add(User user);
     Task Update(User user);
     Task Delete(User id);
     bool UserExists(long id);

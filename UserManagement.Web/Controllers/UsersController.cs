@@ -47,15 +47,12 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Forename,Surname,DateOfBirth,Email,IsActive")] UserListItemViewModel model)
     {
-        await Task.CompletedTask;
-
         if (ModelState.IsValid)
         {
             var user = Helpers.GetUser(model);
 
             await _userService.Add(user);
 
-            //var userAudits = _userAuditService.GetAllAudit().ToList();
             return RedirectToAction(nameof(List));
         }
         return View(model);
@@ -65,18 +62,14 @@ public class UsersController : Controller
     public async Task<IActionResult> Details(long? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var user = await _userService.GetUserById((long)id);
 
-        var userAudits = _userAuditService.GetUserAuditsByUserId((long)id).ToList();
-
         if (user == null)
-        {
             return NotFound();
-        }
+
+        var userAudits = _userAuditService.GetUserAuditsByUserId((long)id).ToList();
 
         var userModel = Helpers.GetModel(user);
 
@@ -93,16 +86,12 @@ public class UsersController : Controller
     public async Task<IActionResult> Edit(long? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var user = await _userService.GetUserById((long)id);
 
         if (user == null)
-        {
             return NotFound();
-        }
 
         var model = Helpers.GetModel(user);
 
@@ -112,12 +101,10 @@ public class UsersController : Controller
     [HttpPost]
     [Route("Edit/{id}")]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(long id, [Bind("Id,Forename,Surname,DateOfBirth,Email,IsActive")] UserListItemViewModel model)
+    public async Task<IActionResult> Edit(long id, [Bind("Id,Forename,Surname,DateOfBirth,Email,IsActive")] UserListItemViewModel model)
     {
         if (id != model.Id)
-        {
             return NotFound();
-        }
 
         if (ModelState.IsValid)
         {
@@ -125,19 +112,14 @@ public class UsersController : Controller
             {
                 var user = Helpers.GetUser(model);
 
-                _userService.Update(user);
-                //var userAudits = _userAuditService.GetAllUserAudits().ToList();
+                await _userService.Update(user);
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!_userService.UserExists(model.Id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
             return RedirectToAction(nameof(List));
         }
@@ -148,16 +130,12 @@ public class UsersController : Controller
     public async Task<IActionResult> Delete(long? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var user = await _userService.GetUserById((long)id);
 
         if (user == null)
-        {
             return NotFound();
-        }
 
         var model = Helpers.GetModel(user);
 
@@ -172,9 +150,7 @@ public class UsersController : Controller
     {
         var user = await _userService.GetUserById((long)id);
         if (user != null)
-        {
             await _userService.Delete(user);
-        }
 
         return RedirectToAction(nameof(List));
     }
