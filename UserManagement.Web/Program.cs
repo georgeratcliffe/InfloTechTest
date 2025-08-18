@@ -28,6 +28,7 @@ builder.Services.AddKeyedScoped<List<AuditEntry>>("Audit", (_, _) => new());
 
 var app = builder.Build();
 
+// add logging to middleware
 app.Use(async (context, next) =>
 {
     // print request information
