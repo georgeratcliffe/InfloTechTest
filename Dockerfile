@@ -6,10 +6,6 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["UserManagement.Services/UserManagement.Services.csproj", "UserManagement.Services/"]
-COPY ["UserManagement.Shared/UserManagement.Shared.csproj", "UserManagement.Shared/"]
-COPY ["UserManagement.Data/UserManagement.Data.csproj", "UserManagement.Data/"]
-COPY ["UserManagement.Web/UserManagement.Web.csproj", "UserManagement/"]
 
 
 COPY Directory.Build.props ./
@@ -35,4 +31,4 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /src/UserManagement/app/publish .
-ENTRYPOINT [ "dotnet","UserManagement.dll" ]
+ENTRYPOINT [ "dotnet","UserManagement.Web.dll" ]
