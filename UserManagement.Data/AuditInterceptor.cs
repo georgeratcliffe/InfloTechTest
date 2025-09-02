@@ -17,39 +17,41 @@ public class AuditInterceptor : SaveChangesInterceptor
         _auditEntries = auditEntries;
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
-        if (eventData.Context is null)
-        {
+        var context = eventData.Context;
+        if (context is null)
             return base.SavingChangesAsync(eventData, result, cancellationToken);
+
+        // Only audit User entities that are Added, Modified, or Deleted
+        var userEntries = context.ChangeTracker.Entries()
+            .Where(x => x.Entity is User &&
+                        x.State is EntityState.Added or EntityState.Modified or EntityState.Deleted);
+
+        var auditEntries = new List<AuditEntry>();
+        foreach (var entry in userEntries)
+        {
+            var user = (User)entry.Entity;
+            auditEntries.Add(new AuditEntry
+            {
+                Id = Guid.CreateVersion7(),
+                Metadata = entry.DebugView?.LongView,
+                UserId = user.Id,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                Email = user.Email,
+                DateOfBirth = user.DateOfBirth,
+                IsActive = user.IsActive,
+                StartTime = DateTime.UtcNow,
+                EntityState = entry.State
+            });
         }
 
-        #pragma warning disable CS8602
-        var auditEntries = eventData.Context.ChangeTracker.Entries()
-            .Where(x => x.Entity is not AuditEntry && x.State is EntityState.Added
-            or EntityState.Modified or EntityState.Deleted)
-            .Select(x =>
-                new AuditEntry
-                {
-                    Id = Guid.CreateVersion7(),
-                    Metadata = x.DebugView.LongView,
-                    UserId = ((User)x.Entity).Id,
-                    Forename = ((User)x.Entity).Forename,
-                    Surname = ((User)x.Entity).Surname,
-                    Email = ((User)x.Entity).Email,
-                    DateOfBirth = ((User)x.Entity).DateOfBirth,
-                    IsActive = ((User)x.Entity).IsActive,
-                    StartTime = DateTime.UtcNow,
-                    EntityState = x.State
-                }
-            ).ToList();
-
-        #pragma warning restore CS8602
-
-        if (auditEntries.Count ==0)
-        {
+        if (auditEntries.Count == 0)
             return base.SavingChangesAsync(eventData, result, cancellationToken);
-        }
 
         _auditEntries.AddRange(auditEntries);
 
@@ -57,28 +59,27 @@ public class AuditInterceptor : SaveChangesInterceptor
     }
         
 
-    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+    public override async ValueTask<int> SavedChangesAsync(
+        SaveChangesCompletedEventData eventData,
+        int result,
+        CancellationToken cancellationToken = default)
     {
+        var context = eventData.Context;
+        if (context is null)
+            return await base.SavedChangesAsync(eventData, result, cancellationToken);
 
-        if (eventData.Context is null)
-        {
-            await base.SavedChangesAsync(eventData, result, cancellationToken);
-        }
-
+        // Set EndTime for all audit entries
+        var now = DateTime.UtcNow;
         foreach (var auditEntry in _auditEntries)
-        {
-            auditEntry.EndTime = DateTime.UtcNow;
-        }
+            auditEntry.EndTime = now;
 
-        #pragma warning disable CS8602
+        // Persist audit entries if any exist
         if (_auditEntries.Count > 0)
         {
-            eventData.Context?.Set<AuditEntry>().AddRange(_auditEntries);
+            context.Set<AuditEntry>().AddRange(_auditEntries);
             _auditEntries.Clear();
-            await eventData.Context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
-        #pragma warning restore CS8602
-
 
         return await base.SavedChangesAsync(eventData, result, cancellationToken);
     }
