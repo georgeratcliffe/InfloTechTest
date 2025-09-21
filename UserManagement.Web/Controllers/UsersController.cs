@@ -13,7 +13,9 @@ public class UsersController : Controller
 {
     private readonly IUserService _userService;
     private readonly IUserAuditService _userAuditService;
-    public UsersController(IUserService userService, IUserAuditService userAuditService) {
+
+    public UsersController(IUserService userService, IUserAuditService userAuditService)
+    {
         _userService = userService;
         _userAuditService = userAuditService;
     }
@@ -21,41 +23,32 @@ public class UsersController : Controller
     [HttpGet]
     public ViewResult List(bool? isActive)
     {
-        IEnumerable<UserListItemViewModel> items;
-
-        if (!isActive.HasValue)
-            items = _userService.GetAll().Select(p => Helpers.GetModel(p));
-        else
-            items = _userService.FilterByActive((bool)isActive).Select(p => Helpers.GetModel(p));
+        var users = !isActive.HasValue
+            ? _userService.GetAll()
+            : _userService.FilterByActive(isActive.Value);
 
         var model = new UserListViewModel
         {
-            Items = items.ToList()
+            Items = users.Select(Helpers.GetModel).ToList()
         };
 
         return View(model);
     }
 
     [Route("Create")]
-    public ViewResult Create()
-    {
-        return View();
-    }
+    public ViewResult Create() => View();
 
     [HttpPost]
     [Route("Create")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Forename,Surname,DateOfBirth,Email,IsActive")] UserListItemViewModel model)
     {
-        if (ModelState.IsValid)
-        {
-            var user = Helpers.GetUser(model);
+        if (!ModelState.IsValid)
+            return View(model);
 
-            await _userService.Add(user);
-
-            return RedirectToAction(nameof(List));
-        }
-        return View(model);
+        var user = Helpers.GetUser(model);
+        await _userService.Add(user);
+        return RedirectToAction(nameof(List));
     }
 
     [Route("Details/{id}")]
@@ -64,18 +57,15 @@ public class UsersController : Controller
         if (id == null)
             return NotFound();
 
-        var user = await _userService.GetUserById((long)id);
-
+        var user = await _userService.GetUserById(id.Value);
         if (user == null)
             return NotFound();
 
-        var userAudits = _userAuditService.GetUserAuditsByUserId((long)id).ToList();
+        var userAudits = _userAuditService.GetUserAuditsByUserId(id.Value).ToList();
 
-        var userModel = Helpers.GetModel(user);
-
-        UserDetailsViewModel model = new()
+        var model = new UserDetailsViewModel
         {
-            Item = userModel,
+            Item = Helpers.GetModel(user),
             AuditEntries = userAudits
         };
 
@@ -88,13 +78,11 @@ public class UsersController : Controller
         if (id == null)
             return NotFound();
 
-        var user = await _userService.GetUserById((long)id);
-
+        var user = await _userService.GetUserById(id.Value);
         if (user == null)
             return NotFound();
 
         var model = Helpers.GetModel(user);
-
         return View(model);
     }
 
@@ -106,24 +94,21 @@ public class UsersController : Controller
         if (id != model.Id)
             return NotFound();
 
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                var user = Helpers.GetUser(model);
+        if (!ModelState.IsValid)
+            return View(model);
 
-                await _userService.Update(user);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_userService.UserExists(model.Id))
-                    return NotFound();
-                else
-                    throw;
-            }
-            return RedirectToAction(nameof(List));
+        try
+        {
+            var user = Helpers.GetUser(model);
+            await _userService.Update(user);
         }
-        return View(model);
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_userService.UserExists(model.Id))
+                return NotFound();
+            throw;
+        }
+        return RedirectToAction(nameof(List));
     }
 
     [Route("Delete/{id}")]
@@ -132,29 +117,25 @@ public class UsersController : Controller
         if (id == null)
             return NotFound();
 
-        var user = await _userService.GetUserById((long)id);
-
+        var user = await _userService.GetUserById(id.Value);
         if (user == null)
             return NotFound();
 
         var model = Helpers.GetModel(user);
-
         return View(model);
     }
-
 
     [HttpPost]
     [Route("Delete/{id}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(long id)
     {
-        var user = await _userService.GetUserById((long)id);
+        var user = await _userService.GetUserById(id);
         if (user != null)
             await _userService.Delete(user);
 
         return RedirectToAction(nameof(List));
     }
-
 
     [Route("Logs")]
     public ViewResult Logs()
