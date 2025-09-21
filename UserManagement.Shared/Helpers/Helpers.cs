@@ -21,7 +21,7 @@ public class Helpers
     public static User GetUser(UserListItemViewModel model)
     {
         return (
-            new User()
+            new User
             {
                 Id = model.Id,
                 Forename = model.Forename ?? string.Empty,
